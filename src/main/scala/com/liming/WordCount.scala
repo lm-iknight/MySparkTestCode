@@ -24,6 +24,7 @@ object WordCount {
     //    val result: Array[(String, Int)] = wordToSum.collect()
     //    打印
     //    result.foreach(println)
+    //    上边的代码可以合并成一行
     sc.textFile("input/manager.log").flatMap(_.split(" ")).map((_, 1)).reduceByKey(_ + _).collect().foreach(println)
 
   }
