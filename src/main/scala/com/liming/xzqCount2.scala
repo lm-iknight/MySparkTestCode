@@ -69,9 +69,7 @@ object xzqCount2 {
     //    如果不定义列名，默认列名是  _c0  _c1  ...
     //    val df: DataFrame = csv_df.select($"_c0").groupBy("_c0").count()
     //    df.show()
-
     //    csv_df.show()
-
     //    println("@@@@@@@@@@@="+l)
     //    *******************************************************
     spark.stop()
@@ -94,7 +92,6 @@ object xzqCount2 {
       for (i <- 0 until fieldArr.length) {
         schemaList.append(StructField(s"_c$i", DataTypes.StringType))
         println("fieldAddr(i)=" + fieldArr(i))
-
       }
     }
     val schema = StructType(schemaList)
