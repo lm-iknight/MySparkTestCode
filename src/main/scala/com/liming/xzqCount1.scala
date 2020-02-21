@@ -5,6 +5,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{DataType, IntegerType, LongType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SQLContext}
 import org.apache.spark.{SparkConf, SparkContext}
+import scala.language.postfixOps
 
 /**
  * 功能描述: 读取行政区的文档并计算每级行政区的个数,使用的是Spark1.x的sparkSql的API,
