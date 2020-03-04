@@ -24,9 +24,10 @@ object xzqCount2 {
     val spark = SparkSession.builder().appName("wordCount2.x").master("local[2]").getOrCreate()
     //集群模式
     //    val spark = SparkSession.builder().appName("wordCount2.x").master("spark://192.168.23.11:7077").getOrCreate()
-    //    *******************************************************
+
     //导入隐式转换
     import spark.implicits._
+    //    *******************************************************
     /*
         //读数据，延时加载的
         //Dataset只有一列，默认这列叫value,如果里边有汉字会是乱码，如：|��������	������	�...|
@@ -54,18 +55,21 @@ object xzqCount2 {
     //这个方法是读csv文件
     import spark.implicits._
     //调试时调用本地文件
-    //        val csv_df: DataFrame = spark.read.format("csv").option("header", "true").option("mode", "DROPMALFORMED").csv(csv_file_path)
+    //    val csv_df: DataFrame = spark.read.format("csv").option("header", "true").option("mode", "DROPMALFORMED").csv(csv_file_path)
     //调用HDFS上的文件,如果此文件里有中文会乱码
-//    val csv_df: DataFrame = spark.read.format("csv").option("header", "true").option("mode", "DROPMALFORMED").csv(cluster_path)
+    //    val csv_df: DataFrame = spark.read.format("csv").option("header", "true").option("mode", "DROPMALFORMED").csv(cluster_path)
 
     ////调用HDFS上的文件,如果此文件里有中文用此方法
     //先定义shcema
-    val mySchema: ArrayBuffer[String] = ArrayBuffer("seq","city_code", "city_name", "county_code", "county_name", "town_code", "town_name", "village_code", "village_name")
-    val csv_df:DataFrame = readZhFile(spark,"TRUE",mySchema,"GBK",csv_file_path)
+    val mySchema: ArrayBuffer[String] = ArrayBuffer("seq", "city_code", "city_name", "county_code", "county_name", "town_code", "town_name", "village_code", "village_name")
+    val csv_df: DataFrame = readZhFile(spark, "TRUE", mySchema, "GBK", csv_file_path)
     //    csv_df.printSchema()
     //    把DataFrame注册成视图
     csv_df.createTempView("csv_view")
-    csv_df.show(20)
+    val resultDF: DataFrame = spark.sql("select city_name ,count(*) as sum from csv_view group by city_name")
+    resultDF.show(200)
+//    resultDF.write.format("json").mode("append").save("f://sparkOut")
+    resultDF.write.format("text").mode("overwrite").save("f://sparkOut")
     //    如果不定义列名，默认列名是  _c0  _c1  ...
     //    val df: DataFrame = csv_df.select($"_c0").groupBy("_c0").count()
     //    df.show()
@@ -85,13 +89,13 @@ object xzqCount2 {
     val schemaList = ArrayBuffer[StructField]()
     if ("TRUE".equals(headerSchema)) {
       for (i <- 0 until fieldArr.length) {
-        println("fieldAddr(i)=" + fieldArr(i))
+//        println("fieldAddr(i)=" + fieldArr(i))
         schemaList.append(StructField(mySchema(i), DataTypes.StringType))
       }
     } else {
       for (i <- 0 until fieldArr.length) {
         schemaList.append(StructField(s"_c$i", DataTypes.StringType))
-        println("fieldAddr(i)=" + fieldArr(i))
+//        println("fieldAddr(i)=" + fieldArr(i))
       }
     }
     val schema = StructType(schemaList)
